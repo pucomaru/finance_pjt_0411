@@ -44,6 +44,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'http://133.186.132.156']
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
+    
     'contentfetch',
     'django.contrib.admin',
     'django.contrib.auth',
