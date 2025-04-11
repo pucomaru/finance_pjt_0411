@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import datetime
 from django.db import models
 from django.conf import settings
@@ -19,3 +20,8 @@ class StockInterest(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.stock}"
+=======
+from django.db import models
+
+# Create your models here.
+>>>>>>> dahye2-dev

@@ -1,0 +1,31 @@
+# Python 기본
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# 가상환경
+venv/
+env/
+
+# Django 설정
+*.db
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# 환경 변수
+.env
+
+# IDE/에디터 관련
+.vscode/
+.idea/
+
+# 운영체제별
+.DS_Store
+Thumbs.db
+
+# Static & media (필요시)
+staticfiles/
+media/
