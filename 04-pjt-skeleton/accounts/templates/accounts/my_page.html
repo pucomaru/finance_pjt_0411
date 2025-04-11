@@ -11,8 +11,10 @@
 </form>
 
 {% for stock in interest_stocks  %}
-  <p>{{stock.stock}}</p> 
-  {% comment %} 종목 삭제 기능 {% endcomment %}
+  <a href="{% url 'contentfetch:stock_finder' %}?company_name={{ stock.stock|urlencode }}">
+    {{ stock.stock }}
+  </a> 
+  
   <form action="{% url "accounts:stock_delete" stock.pk %}" method = "POST">
     {% csrf_token %}
     <input type="submit" value = "삭제">
