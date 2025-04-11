@@ -1,0 +1,25 @@
+<!-- contentfetch/templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Finance Project{% endblock %}</title>
+</head>
+<body>
+  <nav>
+    {% if user.is_authenticated %}
+      <span>{{ user.username }}님 환영합니다!</span>
+      <a href="{% url 'logout' %}">로그아웃</a>
+    {% else %}
+      <a href="{% url 'login' %}">로그인</a>
+      <a href="{% url 'signup' %}">회원가입</a>
+    {% endif %}
+  </nav>
+
+  <hr>
+
+  {% block content %}
+  <!-- 페이지별 내용이 여기에 들어가게 됨 -->
+  {% endblock %}
+</body>
+</html>
