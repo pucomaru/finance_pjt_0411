@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from .models import StockInterest
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def my_page(request):
-    
     # 관심 종목 추가
     if request.method == "POST":
         stock_name = request.POST.get("stock")
@@ -15,7 +16,7 @@ def my_page(request):
             return redirect("accounts:my_page") 
     
     # user 관심 종목들
-    interest_stocks = user.stock_interests.all()
+    interest_stocks = request.user.stock_interests.all()
 
     context = {
         'interest_stocks' : interest_stocks
@@ -23,6 +24,7 @@ def my_page(request):
 
     return render(request,'accounts/my_page.html',context)
 
+@login_required
 def stock_delete(request,stock_pk):
     if request.method == "POST":
         stock = StockInterest.objects.get(pk=stock_pk)
