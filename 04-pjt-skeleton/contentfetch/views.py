@@ -149,41 +149,93 @@ def analyze_comments(comments, company_name):
 
 
 def stock_finder(request):
-    driver = None  # WebDriver 초기화
+    driver = None
+
     if request.method == "POST":
-        # 사용자 입력 받기
-        company_name = request.POST.get('company_name', '').strip().lower()
+        # POST에서 값을 가져옴
         loading_step = request.POST.get('loading_step', '')
+        company_name = request.POST.get('company_name', '').strip().lower()
 
-        if not company_name:
-            return render(
-                request,
-                'contentfetch/stock_finder.html',
-                {'error_message': "회사 이름을 입력하세요."},
-            )
+        if loading_step == 'selenium':
+            print("두 번째 단계: Selenium 크롤링 시작")
 
-        try:
-            # 1. DB에서 `company_name`으로 부분 검색 (부분 일치 허용)
-            existing_data = StockData.objects.filter(
-                company_name__icontains=company_name
-            ).first()
-            if existing_data:
-                print(f"DB에서 기존 데이터 찾음: {existing_data.company_name}")
+            try:
+                # 1. Selenium 실행
+                driver = webdriver.Chrome(service=service, options=chrome_options)
+
+                # 2. Toss에서 종목 정보 & 댓글 크롤링
+                stock_code, company_name = get_stock_code_and_name(driver, company_name)
+                comments = scrape_company_data(driver)
+                print(f"스크래핑 완료: {len(comments)}개 댓글 수집")
+
+                # 3. GPT 분석
+                chatgpt_response = analyze_comments(comments, company_name)
+                print("ChatGPT 분석 완료")
+
+                # 4. DB 저장
+                stock_data = StockData(
+                    company_name=company_name,
+                    stock_code=stock_code,
+                    comments="\n".join(comments),
+                    analysis=chatgpt_response,
+                )
+                stock_data.save()
+                print("DB 저장 완료")
+
+                # 5. 결과 렌더링
                 return render(
                     request,
                     'contentfetch/stock_finder.html',
                     {
-                        'company_name': existing_data.company_name,
-                        'stock_code': existing_data.stock_code,
-                        'comments': existing_data.comments.split("\n"),
-                        'chatgpt_response': existing_data.analysis,
-                        'is_existing_data': True,
+                        'company_name': company_name,
+                        'stock_code': stock_code,
+                        'comments': comments,
+                        'chatgpt_response': chatgpt_response,
+                        'is_existing_data': False,
                         'is_loading': False,
                     },
                 )
 
-            # 2. DB에 없을 경우 Selenium 작업
-            if not loading_step:  # 첫 번째 단계
+            except Exception as e:
+                print(f"오류 발생: {e}")
+                return render(
+                    request,
+                    'contentfetch/stock_finder.html',
+                    {
+                        'error_message': f"스크래핑 중 오류 발생: {e}",
+                        'is_loading': False,
+                    },
+                )
+            finally:
+                if driver:
+                    driver.quit()
+
+    elif request.method == "GET":
+        company_name = request.GET.get('company_name', '').strip().lower()
+
+        if company_name:
+            try:
+                # 1. DB에서 기존 데이터 검색
+                existing_data = StockData.objects.filter(
+                    company_name__icontains=company_name
+                ).first()
+
+                if existing_data:
+                    print(f"DB에서 기존 데이터 찾음: {existing_data.company_name}")
+                    return render(
+                        request,
+                        'contentfetch/stock_finder.html',
+                        {
+                            'company_name': existing_data.company_name,
+                            'stock_code': existing_data.stock_code,
+                            'comments': existing_data.comments.split("\n"),
+                            'chatgpt_response': existing_data.analysis,
+                            'is_existing_data': True,
+                            'is_loading': False,
+                        },
+                    )
+
+                # 2. DB에 없으면 첫 번째 로딩 단계로 이동
                 print("첫 번째 단계: Selenium 로딩 화면 표시")
                 return render(
                     request,
@@ -199,61 +251,22 @@ def stock_finder(request):
                     },
                 )
 
-            # 3. Selenium으로 종목 코드 및 데이터 가져오기
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            stock_code, company_name = get_stock_code_and_name(
-                driver, company_name
-            )
-            comments = scrape_company_data(driver)
-            print(f"스크래핑 완료: {len(comments)}개 댓글 수집")
+            except Exception as e:
+                print(f"오류 발생: {e}")
+                return render(
+                    request,
+                    'contentfetch/stock_finder.html',
+                    {
+                        'error_message': f"데이터 처리 중 오류 발생: {e}",
+                        'is_loading': False,
+                    },
+                )
 
-            print("ChatGPT 분석 시작")
-            chatgpt_response = analyze_comments(comments, company_name)
-            print("ChatGPT 분석 완료")
-
-            # 6. DB에 저장
-            print("DB 저장 시작")
-            stock_data = StockData(
-                company_name=company_name,
-                stock_code=stock_code,
-                comments="\n".join(comments),
-                analysis=chatgpt_response,
-            )
-            stock_data.save()
-            print("DB 저장 완료")
-
-            # 7. 최종 결과 반환
-            print("최종 결과 반환")
-            return render(
-                request,
-                'contentfetch/stock_finder.html',
-                {
-                    'company_name': company_name,
-                    'stock_code': stock_code,
-                    'comments': comments,
-                    'chatgpt_response': chatgpt_response,
-                    'is_existing_data': False,
-                    'is_loading': False,
-                },
-            )
-
-        except Exception as e:
-            print(f"오류 발생: {e}")
-            return render(
-                request,
-                'contentfetch/stock_finder.html',
-                {
-                    'error_message': f"스크래핑 중 오류 발생: {e}",
-                    'is_loading': False,
-                },
-            )
-        finally:
-            if driver:
-                driver.quit()
-
-    # GET 요청 또는 초기 로드
+    # 기본 화면 (검색 이전 상태)
     return render(
-        request, 'contentfetch/stock_finder.html', {'is_loading': False}
+        request,
+        'contentfetch/stock_finder.html',
+        {'is_loading': False}
     )
 
 
