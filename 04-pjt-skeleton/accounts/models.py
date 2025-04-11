@@ -3,11 +3,11 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
-# 사용자 모델 커스텀
+# ✅ 사용자 모델 커스텀
 class User(AbstractUser):
     pass
 
-# 관심 종목 모델
+# ✅ 관심 종목 모델
 class StockInterest(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

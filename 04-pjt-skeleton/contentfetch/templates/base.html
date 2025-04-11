@@ -1,20 +1,53 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Finance{% endblock %}</title>
+    <meta charset="UTF-8">
+    <title>{% block title %}주식 댓글 분석기{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f6f9fc;
+        }
+
+        nav {
+            background-color: #005BAC;
+            padding: 12px 20px;
+        }
+
+        nav a {
+            color: white;
+            margin-right: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            margin: 0;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-  <nav>
-    {% if user.is_authenticated %}
-      {{ user.username }}님, 환영합니다!
-      <a href="{% url 'logout' %}">로그아웃</a>
-    {% else %}
-      <a href="{% url 'login' %}">로그인</a>
-      <a href="{% url 'signup' %}">회원가입</a>
-    {% endif %}
-  </nav>
-  <hr>
-  {% block content %}{% endblock %}
+    <!-- 🔵 네비게이션 바 -->
+    <nav>
+        <a href="{% url 'stock_finder' %}">주식 댓글 분석</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'accounts:logout' %}">로그아웃</a>
+            <a href="{% url 'accounts:my_page' %}">프로필</a>
+        {% else %}
+            <a href="{% url 'accounts:signup' %}">회원가입</a>
+            <a href="{% url 'accounts:login' %}">로그인</a>
+        {% endif %}
+    </nav>
+
+    {% block content %}
+    {% endblock %}
 </body>
 </html>
