@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'http://133.186.132.156']
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
     'contentfetch',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -68,7 +69,7 @@ ROOT_URLCONF = 'scrapy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,3 +140,5 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.User'

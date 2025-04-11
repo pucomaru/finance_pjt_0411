@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{user}}님의 관심 종목</h1>
+{% comment %} 관심 종목 추가 {% endcomment %}
+<form action="{% url "accounts:my_page" %}" method = "POST">
+  {% csrf_token %}
+  <input type="text" name = 'stock' placeholder = "종목명 입력">
+  <button type='submit'>추가</button>
+</form>
+
+{% for stock in interest_stocks  %}
+  <p>{{stock.stock}}</p> 
+  {% comment %} 종목 삭제 기능 {% endcomment %}
+  <form action="{% url "accounts:stock_delete" stock.pk %}" method = "POST">
+    {% csrf_token %}
+    <input type="submit" value = "삭제">
+  </form>
+{% endfor %}
+
+{% endblock content %}
+
+
+
