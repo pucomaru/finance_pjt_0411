@@ -5,7 +5,7 @@ from django.views.generic.base import RedirectView
 app_name = 'contentfetch'
 
 urlpatterns = [
-    path("stock_finder/", views.stock_finder, name="stock_finder"),
+    path("", views.stock_finder, name="stock_finder"),
     path("delete_comment/", views.delete_comment, name="delete_comment"),
-    path("", RedirectView.as_view(url='/pjt04/index/')),
+    # path("", RedirectView.as_view(url='/pjt04/index/')),
 ]

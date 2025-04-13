@@ -11,7 +11,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("stock_finder")
+            return redirect("contentfectch:stock_finder")
     else:
         form = CustomUserCreationForm()
     return render(request, "accounts/signup.html", {"form": form})
@@ -30,7 +30,7 @@ def login_view(request):
 # 로그아웃 뷰
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("accounts:login")
 
 # 마이페이지 (관심 종목 리스트)
 @login_required

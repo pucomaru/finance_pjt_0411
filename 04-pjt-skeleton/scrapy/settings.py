@@ -100,5 +100,5 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # 로그인/로그아웃 경로
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/pjt04/index/'
+LOGIN_REDIRECT_URL = '/accounts/my_page/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
